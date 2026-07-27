@@ -1,0 +1,48 @@
+{
+  "kind": "nexus-kajiya.slide-document",
+  "version": 1,
+  "slides": [
+    {
+      "id": "sample-slide-1",
+      "width": 960,
+      "height": 540,
+      "background": "#0F172A",
+      "elements": [
+        {
+          "id": "sample-title-1",
+          "type": "text",
+          "role": "title",
+          "text": "アイデアを、伝わる一枚へ。",
+          "x": 72,
+          "y": 104,
+          "width": 816,
+          "height": 88,
+          "style": {
+            "fontSize": 48,
+            "fontWeight": "700",
+            "lineHeight": 1.2,
+            "color": "#F8FAFC",
+            "textAlign": "left"
+          }
+        },
+        {
+          "id": "sample-body-1",
+          "type": "text",
+          "role": "body",
+          "text": "Nexus Kajiyaは、JSONをデータソースとして扱う\nシンプルなHTMLスライドエディターです。",
+          "x": 76,
+          "y": 236,
+          "width": 720,
+          "height": 112,
+          "style": {
+            "fontSize": 26,
+            "fontWeight": "400",
+            "lineHeight": 1.5,
+            "color": "#CBD5E1",
+            "textAlign": "left"
+          }
+        }
+      ]
+    }
+  ]
+}
