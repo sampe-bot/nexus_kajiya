@@ -1,6 +1,7 @@
 import type {
   Slide,
   SlideDocument,
+  SlideElement,
   TextElement,
 } from "./slideSchema";
 
@@ -10,7 +11,7 @@ function updateElement(
   document: SlideDocument,
   slideId: string,
   elementId: string,
-  update: (element: TextElement, slide: Slide) => TextElement,
+  update: (element: SlideElement, slide: Slide) => SlideElement,
 ): SlideDocument {
   let documentChanged = false;
 
@@ -25,8 +26,13 @@ function updateElement(
         return element;
       }
 
+      const updatedElement = update(element, slide);
+      if (updatedElement === element) {
+        return element;
+      }
+
       slideChanged = true;
-      return update(element, slide);
+      return updatedElement;
     });
 
     if (!slideChanged) {
@@ -46,10 +52,9 @@ export function updateTextElement(
   elementId: string,
   text: string,
 ): SlideDocument {
-  return updateElement(document, slideId, elementId, (element) => ({
-    ...element,
-    text,
-  }));
+  return updateElement(document, slideId, elementId, (element) =>
+    element.type === "text" ? { ...element, text } : element,
+  );
 }
 
 export function moveTextElement(
@@ -58,9 +63,13 @@ export function moveTextElement(
   elementId: string,
   position: TextElementPosition,
 ): SlideDocument {
-  return updateElement(document, slideId, elementId, (element, slide) => ({
-    ...element,
-    x: Math.min(Math.max(position.x, 0), slide.width - element.width),
-    y: Math.min(Math.max(position.y, 0), slide.height - element.height),
-  }));
+  return updateElement(document, slideId, elementId, (element, slide) =>
+    element.type === "text"
+      ? {
+          ...element,
+          x: Math.min(Math.max(position.x, 0), slide.width - element.width),
+          y: Math.min(Math.max(position.y, 0), slide.height - element.height),
+        }
+      : element,
+  );
 }

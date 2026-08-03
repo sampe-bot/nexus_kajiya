@@ -135,8 +135,13 @@ export function SlideEditor({ document, onChange }: SlideEditorProps) {
 
       <div className="editor-overlay" aria-label="テキスト編集レイヤー">
         {slide.elements.map((element) => {
+          if (element.type !== "text") {
+            return null;
+          }
+
           const isActive = activeElementId === element.id;
           const isEditing = editing?.elementId === element.id;
+          const elementLabel = element.role ?? "text";
 
           return (
             <div
@@ -154,7 +159,7 @@ export function SlideEditor({ document, onChange }: SlideEditorProps) {
                 width: `${(element.width / slide.width) * 100}%`,
                 height: `${(element.height / slide.height) * 100}%`,
               }}
-              aria-label={`${element.role}テキスト。ダブルクリックで編集`}
+              aria-label={`${elementLabel}テキスト。ダブルクリックで編集`}
               onPointerDown={(event) => startDrag(event, element)}
               onPointerMove={continueDrag}
               onPointerUp={stopDrag}
@@ -203,7 +208,7 @@ function InlineTextEditor({
     <textarea
       ref={textareaRef}
       className="inline-text-editor"
-      aria-label={`${element.role}テキストを編集`}
+      aria-label={`${element.role ?? "text"}テキストを編集`}
       value={value}
       style={{
         color: element.style.color,

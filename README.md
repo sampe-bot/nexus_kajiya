@@ -78,6 +78,10 @@ Markdown、GUI、AI、共同編集のどこから変更しても、中心にあ�
 - テキスト要素のドラッグ移動
 - ダブルクリックによるインライン編集
 - ZodによるDocument Modelの検証
+- Document Model v2による複数スライド・任意数要素の表現
+- 文書全体で一意なスライドID・要素IDの検証
+- v1 JSONの検証とv2への自動マイグレーション
+- テンプレート固有制約と文書スキーマの分離
 - JSONファイルの読み込み・保存
 - 表示専用Rendererと編集オーバーレイの分離
 - Dockerによる開発・本番ビルド
@@ -95,7 +99,7 @@ Markdown、GUI、AI、共同編集のどこから変更しても、中心にあ�
 
 ### まだできないこと
 
-- 複数スライド
+- 複数スライドの追加・選択・並べ替えUI
 - 要素の追加・削除・リサイズ
 - 画像、図形、表、グラフ
 - Markdownの取り込み
@@ -122,11 +126,11 @@ Markdown、GUI、AI、共同編集のどこから変更しても、中心にあ�
 
 次に優先するのは、AIや共同編集ではなく、編集の土台です。
 
-1. Document Modelを複数スライド・複数要素へ拡張する
-2. すべての変更をCommandとして表現し、Undo / Redoを実装する
-3. 選択、移動、リサイズ、追加、削除、スタイル変更を一貫したUIで扱う
-4. ローカル自動保存とスキーマ移行を追加する
-5. Document OperationsとRendererの自動テストを整備する
+- [x] Document Model v2を複数スライド・任意数要素へ拡張し、v1からの移行を追加する
+- [ ] すべての変更をCommandとして表現し、Undo / Redoを実装する
+- [ ] 選択、移動、リサイズ、追加、削除、スタイル変更を一貫したUIで扱う
+- [ ] ローカル自動保存を追加する
+- [ ] Document OperationsとRendererの自動テストを拡充する
 
 v0.2の完了条件は、**ブラウザだけで複数枚の資料を作成・編集し、閉じてから復元しても同じ状態と見た目を再現できること**です。
 
@@ -153,6 +157,7 @@ v0.2の完了条件は、**ブラウザだけで複数枚の資料を作成・�
 主なファイル:
 
 - [`src/model/slideSchema.ts`](src/model/slideSchema.ts) — バージョン付きDocument Modelのスキーマ
+- [`src/model/slideTemplate.ts`](src/model/slideTemplate.ts) — テンプレート固有の制約検証
 - [`src/model/documentOperations.ts`](src/model/documentOperations.ts) — 文書を不変更新する操作
 - [`src/components/SlideRenderer.tsx`](src/components/SlideRenderer.tsx) — 表示専用Renderer
 - [`src/components/SlideEditor.tsx`](src/components/SlideEditor.tsx) — ドラッグとテキスト編集のUI

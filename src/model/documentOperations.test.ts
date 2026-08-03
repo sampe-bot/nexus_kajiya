@@ -8,7 +8,7 @@ import type { SlideDocument } from "./slideSchema";
 function createDocument(): SlideDocument {
   return {
     kind: "nexus-kajiya.slide-document",
-    version: 1,
+    version: 2,
     slides: [
       {
         id: "slide-1",

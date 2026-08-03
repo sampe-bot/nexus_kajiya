@@ -22,6 +22,10 @@ export function SlideRenderer({
       </p>
 
       {slide.elements.map((element) => {
+        if (element.type !== "text") {
+          return null;
+        }
+
         const style: CSSProperties = {
           left: `${(element.x / slide.width) * 100}%`,
           top: `${(element.y / slide.height) * 100}%`,
@@ -37,7 +41,12 @@ export function SlideRenderer({
         return (
           <div
             key={element.id}
-            className={`rendered-text rendered-text--${element.role}`}
+            className={[
+              "rendered-text",
+              element.role ? `rendered-text--${element.role}` : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
             data-slide-element-id={element.id}
             style={style}
           >

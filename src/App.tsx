@@ -1,14 +1,15 @@
 import { useRef, useState, type ChangeEvent } from "react";
 import { SlideEditor } from "./components/SlideEditor";
 import {
+  CURRENT_SLIDE_DOCUMENT_VERSION,
   formatValidationError,
-  slideDocumentSchema,
+  safeParseSlideDocument,
   type SlideDocument,
 } from "./model/slideSchema";
 
 const initialDocument: SlideDocument = {
   kind: "nexus-kajiya.slide-document",
-  version: 1,
+  version: CURRENT_SLIDE_DOCUMENT_VERSION,
   slides: [{
     id: "slide-1",
     width: 960,
@@ -75,7 +76,7 @@ export function App() {
     if (!file) return;
 
     try {
-      const parsed = slideDocumentSchema.safeParse(JSON.parse(await file.text()));
+      const parsed = safeParseSlideDocument(JSON.parse(await file.text()));
       if (!parsed.success) {
         setError(formatValidationError(parsed.error));
         return;
