@@ -6,7 +6,7 @@ import {
   safeParseSlideDocument,
   type SlideDocument,
 } from "./model/slideSchema";
-
+// アプリ起動時に初期表示されるサンプルデータ（UIのプレビュー用）
 const initialDocument: SlideDocument = {
   kind: "nexus-kajiya.slide-document",
   version: CURRENT_SLIDE_DOCUMENT_VERSION,
@@ -54,27 +54,35 @@ const initialDocument: SlideDocument = {
   }],
 };
 export function App() {
+  // スライドの全データを管理する、このアプリの「単一の真実のソース」
   const [document, setDocument] = useState(initialDocument);
   const [error, setError] = useState("");
+
+  // 見た目がダサい標準の <input type="file"> を隠し、別のボタンから起動させるための参照
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const saveDocument = () => {
+    // 1. JSONデータをメモリ上のファイル（Blob）に変換し、ダウンロード用のURLを発行
     const url = URL.createObjectURL(
       new Blob([JSON.stringify(document, null, 2)], { type: "application/json" }),
     );
+    // 2. 透明な <a> タグをプログラム上で作り、クリックさせてダウンロードを強制発火
     const link = window.document.createElement("a");
     link.href = url;
     link.download = "slide-document.json";
     link.click();
+    // 3. メモリリーク（無駄なメモリ消費）を防ぐため、使用済みのURLを解放
     URL.revokeObjectURL(url);
   };
 
   const loadDocument = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    // 同一ファイルを連続で読み込んだ場合でも onChange を発火させるためのリセット
     event.target.value = "";
     if (!file) return;
 
     try {
+      // 壊れたJSONや、構造が違うデータが読み込まれてアプリがクラッシュするのを防ぐ（バリデーション）
       const parsed = safeParseSlideDocument(JSON.parse(await file.text()));
       if (!parsed.success) {
         setError(formatValidationError(parsed.error));
@@ -83,6 +91,7 @@ export function App() {
       setDocument(parsed.data);
       setError("");
     } catch {
+      // JSONの文法エラー（カッコ閉じ忘れ等）で parse が失敗した際のセーフティネット
       setError("JSONファイルを読み取れませんでした");
     }
   };
@@ -95,15 +104,18 @@ export function App() {
           <h1>HTML Slide Editor</h1>
         </div>
         <div className="toolbar">
+          {/* このキレイなボタンを押すことで、裏にある hidden な input を代わりにクリックさせる */}
           <button type="button" onClick={() => fileInputRef.current?.click()}>
             JSONを読み込む
           </button>
           <button type="button" className="primary" onClick={saveDocument}>
             JSONを保存
           </button>
+          {/* 実際のファイル受取口 */}
           <input
             ref={fileInputRef}
             type="file"
+            // MIMEタイプと拡張子を併記し、一部のOS/ブラウザでファイルがグレーアウトするのを防ぐ
             accept="application/json,.json"
             hidden
             onChange={loadDocument}
@@ -112,6 +124,7 @@ export function App() {
       </header>
       {error ? <pre className="error-message">{error}</pre> : null}
       <section className="workspace">
+        {/* エディタ側での操作（ドラッグやテキスト編集）を、親の setDocument にそのまま流し込む */}
         <SlideEditor document={document} onChange={setDocument} />
       </section>
       <p className="hint">
