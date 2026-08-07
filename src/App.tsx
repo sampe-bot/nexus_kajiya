@@ -53,7 +53,6 @@ const initialDocument: SlideDocument = {
     ],
   }],
 };
-
 export function App() {
   const [document, setDocument] = useState(initialDocument);
   const [error, setError] = useState("");
