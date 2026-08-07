@@ -79,6 +79,7 @@ export function App() {
     const file = event.target.files?.[0];
     // 同一ファイルを連続で読み込んだ場合でも onChange を発火させるためのリセット
     event.target.value = "";
+    
     if (!file) return;
 
     try {
