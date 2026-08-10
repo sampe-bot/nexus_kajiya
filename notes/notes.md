@@ -30,3 +30,12 @@ type SlideEditorProps = {
   2. 意味的にまとまった div（className が役割を示す）
   3. 繰り返し構造（map で生成される要素）
   4. 条件付きレンダリング（isEditing ? ...）
+
+- useState & useRef
+  - useState 
+    → 値が変わると コンポーネントが再レンダリングされる
+  - useRef
+    → 値が変わっても 再レンダリングされない
+
+- ブラウザの Pointer Events API 
+  - 
