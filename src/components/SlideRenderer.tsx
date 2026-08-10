@@ -20,7 +20,7 @@ export function SlideRenderer({
       <p className="slide-kicker" aria-hidden="true">
         NEXUS KAJIYA / 01
       </p>
-
+      // 将来的に画像や図形が追加されることを想定した分岐
       {slide.elements.map((element) => {
         if (element.type !== "text") {
           return null;
