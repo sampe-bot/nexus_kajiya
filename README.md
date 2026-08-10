@@ -2,167 +2,42 @@
 
 > 知識をつなぎ、人とAIで価値ある成果物へ鍛え、次の世代へつなぐ。
 
+## プロジェクト概要
+
 Nexus Kajiyaは、LLMが生成したMarkdownやHTMLスライドを、人がブラウザ上で仕上げられるようにするところから始める、AIネイティブな成果物編集基盤です。
 
-現在は、**構造化JSONを正本として1枚のHTMLスライドを編集するv0.1 MVP**です。完成した共同編集サービスではなく、今後の中核となる文書モデル・Renderer・編集操作の分離を検証しています。
+LLMが作った最初の90%をすべて再生成するのではなく、人とAIが変更内容を安全に積み重ね、再利用できる成果物へ磨き上げる環境を目指しています。
 
-## なぜ作るのか
+背景には、小さな修正でも再生成が必要になり、人が加えた調整や意図が失われやすいという課題があります。GUI、コード、AIによる変更を同じ履歴として扱い、議論や知識を組織で再利用できる成果物へ育てることが長期的な狙いです。
 
-LLMによって、Markdown、HTML、プレゼンテーションなどの最初の成果物は短時間で生成できるようになりました。一方、生成後の制作にはまだ次の課題があります。
+名前は、人・AI・知識・成果物が交わる結節点を表す**Nexus**と、素材を繰り返し鍛えて長く使える道具へ変える**Kajiya（鍛冶屋）**に由来します。
 
-- 小さな修正でも、プロンプトによる再生成が必要になる
-- 再生成すると、人が加えた調整や意図が失われやすい
-- HTMLやCSSを直接編集するには専門知識が必要になる
-- GUI、コード、AIによる変更が、同じ履歴として残らない
-- 議論や知識が、再利用できる組織の成果物へ育たない
+現在は、**構造化JSONを正本としてHTMLスライドを編集するv0.1 MVP**です。完成した共同編集サービスではなく、今後の中核となるDocument Model、文書操作、Renderer、編集UIの分離を検証しています。
 
-Nexus Kajiyaは、AIにすべてを再生成させるのではなく、**AIが作った最初の90%を、人とAIが安全に磨き上げる制作環境**を目指します。
+> 当面の対象は、LLMが生成したMarkdownまたは所定形式のデータからHTMLスライドを作り、人がGUIで修正し、再利用可能な形式で保存・出力することです。
 
-## 名前に込めた意味
+### 現在できること
 
-- **Nexus** — 人、AI、知識、成果物が交わる結節点
-- **Kajiya（鍛冶屋）** — 素材を繰り返し鍛え、長く使える道具へ変える職人
-
-知識を集めるだけでなく、共同で磨き、会社にとって価値ある成果物にし、その背景とともに未来へ残す。そのための「知識の鍛冶場」がNexus Kajiyaです。
-
-## プロダクトの焦点
-
-長期的には、スライドに限らず、技術文書、分析レポート、手順書、ダッシュボードなどを扱える成果物編集基盤を構想しています。
-
-ただし、当面は対象を次に絞ります。
-
-> **LLMが生成したMarkdownまたは所定形式のデータからHTMLスライドを作り、人がGUIで修正し、再利用可能な形式で保存・出力する。**
-
-最初から任意のHTMLやPowerPointとの完全な互換性を目指すのではなく、制約されたスライドモデルで「生成後の編集」を確実に良くすることを優先します。
-
-## 設計方針
-
-### 1. HTMLではなく、構造化文書を正本にする
-
-HTML文字列を直接共同編集すると、要素の削除と内容の変更が競合したときに構造が壊れやすくなります。そこで、バージョン付きのDocument Modelを唯一のデータソースとし、HTMLはそこから生成される出力として扱います。
-
-### 2. すべての変更を同じ操作として扱う
-
-GUI操作、Markdownの取り込み、AI編集、将来の共同編集は、Document Modelに対する小さな操作へ変換します。これにより、Undo、差分表示、レビュー、監査履歴を同じ仕組みで実現できるようにします。
-
-### 3. Rendererを編集UIから分離する
-
-同じ入力から同じ表示・出力が得られる決定的なRendererを維持します。編集用の選択枠や入力欄はRendererの外側に重ね、成果物へ混入させません。
-
-### 4. 正しさ、表現力、AI、共同編集の順に積み上げる
-
-共同編集やAIを先に追加しても、文書モデルと基本操作が不安定であれば変更を安全にマージできません。まず単独ユーザーで壊れずに編集・保存・復元できることを固め、その後にAIと複数人の操作を接続します。
-
-## 目指すアーキテクチャ
-
-```mermaid
-flowchart LR
-    A["Markdown / 対応HTML / GUI"] --> B["Versioned Document Model"]
-    G["AI commands"] --> C["Document Operations"]
-    B <--> C
-    C <--> H["History / Review"]
-    C <--> I["Realtime Collaboration"]
-    B --> D["Deterministic Renderer"]
-    D --> E["HTML"]
-    D --> F["PDF / other formats"]
-```
-
-Markdown、GUI、AI、共同編集のどこから変更しても、中心にあるDocument Modelへ同じルールで反映される構造を目指します。
-
-## 現在のMVP — v0.1
-
-現在実装されている機能は次のとおりです。
-
-- 960 × 540の単一スライド
-- `title` / `body`テキスト要素の表示
-- テキスト要素のドラッグ移動
-- ダブルクリックによるインライン編集
-- ZodによるDocument Modelの検証
-- Document Model v2による複数スライド・任意数要素の表現
-- 文書全体で一意なスライドID・要素IDの検証
-- v1 JSONの検証とv2への自動マイグレーション
-- テンプレート固有制約と文書スキーマの分離
-- JSONファイルの読み込み・保存
+- 960 × 540のスライドを表示
+- `title` / `body`テキストをドラッグして移動
+- ダブルクリックでテキストをインライン編集
+- 複数スライド・任意数要素を表現できるDocument Model v2
+- ZodによるJSON検証と、v1からv2への自動マイグレーション
+- JSONファイルの読み込みと保存
 - 表示専用Rendererと編集オーバーレイの分離
-- Dockerによる開発・本番ビルド
 
-サンプルデータは[`samples/sample-slide-document.json`](samples/sample-slide-document.json)にあります。
+画面上で編集できるのは現在、文書内の先頭スライドだけです。サンプルデータは[`samples/sample-slide-document.json`](samples/sample-slide-document.json)にあります。
 
 ### 現在の操作
 
-- テキストをドラッグして移動
-- テキストをダブルクリックして編集
-- `Ctrl + Enter`、macOSでは `⌘ + Enter`、またはフォーカスを外して確定
-- `Esc`で編集をキャンセル
-- `JSONを保存`で現在のDocument Modelをダウンロード
-- `JSONを読み込む`で保存済みの状態を復元
+- ドラッグ: テキストを移動
+- ダブルクリック: テキストを編集
+- `Ctrl + Enter`（macOSでは`⌘ + Enter`）またはフォーカスを外す: 編集を確定
+- `Esc`: 編集をキャンセル
+- `JSONを保存`: 現在のDocument Modelをダウンロード
+- `JSONを読み込む`: 保存済みの状態を復元
 
-### まだできないこと
-
-- 複数スライドの追加・選択・並べ替えUI
-- 要素の追加・削除・リサイズ
-- 画像、図形、表、グラフ
-- Markdownの取り込み
-- 編集済みHTMLのダウンロード
-- Undo / Redo、変更履歴、コメント
-- AIによる自然言語編集
-- 複数人でのリアルタイム共同編集
-- PDF / PPTX出力
-
-## Roadmap
-
-バージョン番号は目安です。機能数ではなく、各段階で検証したいプロダクト仮説を基準に進めます。
-
-| Phase | テーマ | 主な成果 |
-| --- | --- | --- |
-| **v0.1 — Core Prototype** | 文書モデルと編集方式の検証 | 単一スライド、テキスト編集・移動、JSON入出力、Renderer分離 |
-| **v0.2 — Reliable Editor** | 単独ユーザーで壊れずに編集できる | 複数スライド、要素操作、リサイズ、スタイル編集、Undo / Redo、自動保存、スキーマ移行、テスト |
-| **v0.3 — Markdown to Artifact** | LLM出力を実用的な成果物へ変換する | Markdown取り込み、テーマとレイアウト、画像、静的HTML出力、再読み込み |
-| **v0.4 — AI Editing** | AIの変更を安全・可逆にする | 選択範囲への自然言語編集、構造化Patch、変更プレビュー、適用・却下、操作履歴 |
-| **v0.5 — Collaboration** | 人と人、人とAIが同じ成果物を編集する | 共有ドキュメント、Presence、リアルタイム同期、コメント、競合処理、権限の最小構成 |
-| **v1.0 — Knowledge Lifecycle** | 成果物を組織の資産として残す | バージョン、レビュー・承認、出典と作成意図、テンプレート、検索・再利用、外部連携 |
-
-### 次のマイルストーン: v0.2
-
-次に優先するのは、AIや共同編集ではなく、編集の土台です。
-
-- [x] Document Model v2を複数スライド・任意数要素へ拡張し、v1からの移行を追加する
-- [ ] すべての変更をCommandとして表現し、Undo / Redoを実装する
-- [ ] 選択、移動、リサイズ、追加、削除、スタイル変更を一貫したUIで扱う
-- [ ] ローカル自動保存を追加する
-- [ ] Document OperationsとRendererの自動テストを拡充する
-
-v0.2の完了条件は、**ブラウザだけで複数枚の資料を作成・編集し、閉じてから復元しても同じ状態と見た目を再現できること**です。
-
-## 現時点での非目標
-
-スコープを保つため、少なくともv0.xでは次を目標にしません。
-
-- 任意の既存Webサイトを、そのJavaScriptを含めて完全に取り込む
-- PowerPointやFigmaの全機能を再実装する
-- 任意のHTMLを往復変換して、元のコードを完全に保持する
-- 独自のLLMそのものを開発する
-- スライド編集と同時に、汎用的な社内WikiやRAG基盤を完成させる
-
-対応HTMLを取り込む場合も、編集可能な要素とCSSを定義したサポート対象形式から段階的に進めます。
-
-## 技術構成
-
-- React 19
-- TypeScript
-- Vite
-- Zod
-- Docker / Nginx
-
-主なファイル:
-
-- [`src/model/slideSchema.ts`](src/model/slideSchema.ts) — バージョン付きDocument Modelのスキーマ
-- [`src/model/slideTemplate.ts`](src/model/slideTemplate.ts) — テンプレート固有の制約検証
-- [`src/model/documentOperations.ts`](src/model/documentOperations.ts) — 文書を不変更新する操作
-- [`src/components/SlideRenderer.tsx`](src/components/SlideRenderer.tsx) — 表示専用Renderer
-- [`src/components/SlideEditor.tsx`](src/components/SlideEditor.tsx) — ドラッグとテキスト編集のUI
-
-## 開発を始める
+## セットアップ
 
 ### Docker Compose
 
@@ -172,13 +47,20 @@ docker compose up --build
 
 ブラウザで`http://localhost:5173`を開きます。
 
-### ローカル
+### ローカル開発
 
 Node.js 22を推奨します。
 
 ```bash
 npm install
 npm run dev
+```
+
+### テストとビルド
+
+```bash
+npm test
+npm run build
 ```
 
 ### 本番用コンテナ
@@ -193,21 +75,44 @@ docker run --rm -p 8080:80 nexus-kajiya:latest
 
 ブラウザで`http://localhost:8080`を開きます。
 
-### ビルド
+## ディレクトリ構成
 
-```bash
-npm run build
+```text
+.
+├── docker/                   # 開発・本番コンテナの定義
+├── docs/
+│   └── architecture.md       # アーキテクチャの詳細
+├── samples/                  # 読み込み可能なサンプルJSON
+├── src/
+│   ├── components/
+│   │   ├── SlideEditor.tsx   # 編集操作と編集用オーバーレイ
+│   │   └── SlideRenderer.tsx # Document Modelの表示
+│   ├── model/
+│   │   ├── slideSchema.ts    # スキーマ、検証、マイグレーション
+│   │   ├── slideTemplate.ts  # テンプレート固有の制約
+│   │   └── documentOperations.ts # 文書の不変更新操作
+│   ├── App.tsx               # 文書状態とJSON入出力
+│   └── main.tsx              # Reactエントリーポイント
+├── compose.yaml
+├── package.json
+└── vite.config.ts
 ```
 
-## 判断基準
+## アーキテクチャ概要
 
-今後の機能は、次の問いに「はい」と答えられるかで優先順位を決めます。
+```mermaid
+flowchart LR
+    JSON["JSON"] --> Validation["Validation / Migration"]
+    Validation --> Model["Versioned Document Model"]
+    GUI["GUI"] --> Ops["Document Operations"]
+    Ops --> Model
+    Model --> Renderer["Deterministic Renderer"]
+    Renderer --> View["HTML slide"]
+```
 
-1. LLM生成後の手直しを、再生成より速く安全にできるか
-2. 人の変更や意図を失わず、後から確認・取り消しできるか
-3. 特定のAIや出力形式に閉じず、構造化データとして再利用できるか
-4. 単発のデモではなく、実際の資料作成で繰り返し使えるか
-5. 将来、複数人とAIの操作を同じ履歴へ統合できるか
+HTMLを直接編集せず、バージョン付きDocument Modelを唯一のデータソースとして扱います。GUIからの変更は文書操作を通じてモデルへ反映し、Rendererはモデルから表示を生成します。
+
+システム構成、データフロー、モジュール境界、技術選定、今後の拡張方針は[`docs/architecture.md`](docs/architecture.md)を参照してください。
 
 ---
 
