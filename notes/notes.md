@@ -37,5 +37,6 @@ type SlideEditorProps = {
   - useRef
     → 値が変わっても 再レンダリングされない
 
-- ブラウザの Pointer Events API 
-  - 
+- 型チェック
+  - Zod = “実行時の型チェック”、TypeScript = “コンパイル時の型チェック”
+  - JSON や API から来たデータを安全に扱うための“バリデーションエンジン”
