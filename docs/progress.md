@@ -16,6 +16,23 @@
 | P4 | 自動保存 | `localStorage`へ検証済み文書を保存し、再起動時に復元 |
 | P5 | テスト・仕上げ | Operations、履歴、Renderer、主要操作を自動テスト。ドキュメント更新 |
 
+## P0 開発基準線の復元
+
+- [x] Node.js 22で依存関係を復元
+- [x] `npm test`成功
+- [x] `npm run build`成功
+- [x] `npm run check`追加
+- [x] RendererのJSXコメントを修正
+- [x] JSON保存・読込を手動確認
+- [x] Docker Composeで起動確認
+
+### 確認環境
+
+- Node.js: v22.23.2
+- npm: 10.9.8
+- 確認日: 2026/08/10
+
+
 ### P1で重要な設計
 
 Commandは最低限、次の操作を表現します。
