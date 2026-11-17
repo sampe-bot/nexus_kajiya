@@ -43,10 +43,12 @@ flowchart TB
         FileIn["JSON file"] --> Parse["JSON parse"]
         Parse --> Version{"version"}
         Version -->|v1| ValidateV1["v1 validation"]
-        ValidateV1 --> Migrate["v1 → v2 migration"]
-        Migrate --> ValidateV2["v2 validation"]
-        Version -->|v2| ValidateV2
-        ValidateV2 --> State["Document state\nApp.tsx"]
+        ValidateV1 --> Migrate["legacy to v3 migration"]
+        Migrate --> ValidateV3["v3 validation"]
+        Version -->|v2| ValidateV2["v2 validation"]
+        ValidateV2 --> Migrate
+        Version -->|v3| ValidateV3
+        ValidateV3 --> State["Document state\nApp.tsx"]
 
         UI["Editor overlay\nSlideEditor"] --> Ops["Document Operations"]
         Ops --> State
@@ -65,7 +67,7 @@ flowchart TB
 | Editing UI | `src/components/SlideEditor.tsx` | 選択、ドラッグ、インライン編集、座標変換 |
 | Rendering | `src/components/SlideRenderer.tsx` | Slideから表示専用HTMLを決定的に生成 |
 | Domain operations | `src/model/documentOperations.ts` | Document Modelを破壊せずに更新 |
-| Schema / migration | `src/model/slideSchema.ts` | 型、実行時検証、文書バージョン、v1からv2への移行 |
+| Schema / migration | `src/model/slideSchema.ts` | 型、実行時検証、文書バージョン、v1 / v2からv3への移行 |
 | Template rules | `src/model/slideTemplate.ts` | `title` / `body`などテンプレート固有の制約を文書スキーマから分離 |
 
 ### 3.2 目標構成
@@ -124,8 +126,8 @@ Document Operationsは入力モデルを直接変更しません。対象が見�
 1. ブラウザのFile APIでJSONファイルを読み込む
 2. `JSON.parse`で構文を解析する
 3. 宣言された`version`を確認する
-4. v1ならv1スキーマで検証した後、v2へ移行する
-5. v2スキーマで、型、ID一意性、要素境界などを検証する
+4. v1 / v2なら各バージョンのスキーマで検証した後、v3へ移行する
+5. v3スキーマで、型、ID一意性、要素境界などを検証する
 6. 成功時だけDocument stateを置き換え、失敗時は既存状態を維持してエラーを表示する
 
 ### 4.3 JSON保存
@@ -139,12 +141,12 @@ Document Operationsは入力モデルを直接変更しません。対象が見�
 
 ## 5. Document Model
 
-Document Model v2の概略は次のとおりです。
+Document Model v3の概略は次のとおりです。
 
 ```text
 SlideDocument
 ├── kind: "nexus-kajiya.slide-document"
-├── version: 2
+├── version: 3
 └── slides[]
     ├── id
     ├── width: 960
@@ -167,6 +169,8 @@ SlideDocument
 - 要素はスライド領域からはみ出さない
 - 色、文字サイズ、ウェイト、行間、配置は定義済みの範囲に収まる
 - `title` / `body`の必須条件は文書全体の制約ではなく、テンプレートの制約として扱う
+
+v3ではTextElementにruns（文中の書式と改行）、verticalAlignを追加し、フォント・太さ・字間・行間も保持します。従来のv1 / v2はlegacySlideSchema.tsの変更前スキーマで検証してから移行します。従来要素の縦中央揃えは維持し、HTML由来の要素は実際の文字位置に合わせて上端揃えで描画します。
 
 要素型は`type`によるdiscriminated unionです。画像、図形、表などは新しい要素スキーマをunionへ追加し、利用側が`type`ごとに分岐する形で拡張します。
 
@@ -280,7 +284,7 @@ AIにはモデル全体の自由な再生成ではなく、検証可能なComman
 
 対応HTMLを取り込む場合も、編集可能な要素とCSSを定義したサポート対象形式から段階的に進めます。
 
-HTML読み込みの追加実装は[HTML読み込みの実装方針](html-import-plan.md)に従います。初版は静的HTMLの対応部分をDocument Model v2へ変換し、変換後のプレビューと警告を確認してから編集文書へ取り込みます。初版は実装済みで、複数スライドの選択と編集にも対応します。
+HTML読み込みの追加実装は[HTML読み込みの実装方針](html-import-plan.md)に従います。初版は静的HTMLの対応部分をDocument Model v3へ変換し、変換後のプレビューと警告を確認してから編集文書へ取り込みます。初版は実装済みで、複数スライドの選択と編集にも対応します。
 
 ## 10. 設計判断の基準
 

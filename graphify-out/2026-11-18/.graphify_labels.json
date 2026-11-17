@@ -19,5 +19,6 @@
   "17": "html-import.spec.ts",
   "18": "notes.md",
   "19": "playwright.config.ts",
-  "20": "vitest.config.ts"
+  "20": "vitest.config.ts",
+  "21": "legacySlideSchema.ts"
 }

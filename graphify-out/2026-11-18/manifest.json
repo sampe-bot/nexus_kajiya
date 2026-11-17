@@ -25,13 +25,13 @@
     "semantic_hash": ""
   },
   "src/components/SlideEditor.tsx": {
-    "mtime": 1794947809.373188,
-    "ast_hash": "206f9d816c6845c3119a07b43123bd68",
+    "mtime": 1794953547.9088485,
+    "ast_hash": "d0e324fdf64b46d0d665e8cfcc109aec",
     "semantic_hash": ""
   },
   "src/components/SlideRenderer.tsx": {
-    "mtime": 1794947809.3729992,
-    "ast_hash": "9db7a387ff7e0f466247281a1aa59508",
+    "mtime": 1794953547.9086797,
+    "ast_hash": "41663792b44a12f865315739c4eb0a6f",
     "semantic_hash": ""
   },
   "src/main.tsx": {
@@ -40,23 +40,23 @@
     "semantic_hash": "15d6068c4f9c620b7c3a114d38c2595d"
   },
   "src/model/documentOperations.test.ts": {
-    "mtime": 1794917009.3710697,
-    "ast_hash": "789ffc33a2a86f4ad1fef90dd1a8a6ed",
-    "semantic_hash": "789ffc33a2a86f4ad1fef90dd1a8a6ed"
+    "mtime": 1794954854.7556672,
+    "ast_hash": "3dea635d0e5a762e456c84dce6295fea",
+    "semantic_hash": ""
   },
   "src/model/documentOperations.ts": {
-    "mtime": 1794917009.3711393,
-    "ast_hash": "de4fa363e11a6cd8adde52e9d442c5d8",
-    "semantic_hash": "de4fa363e11a6cd8adde52e9d442c5d8"
+    "mtime": 1794953629.8028035,
+    "ast_hash": "ad8fa121b01709b640e20c64e5e6abef",
+    "semantic_hash": ""
   },
   "src/model/slideSchema.test.ts": {
-    "mtime": 1794917009.371241,
-    "ast_hash": "41621db39cf40c40eeced5338648f903",
-    "semantic_hash": "41621db39cf40c40eeced5338648f903"
+    "mtime": 1794954854.7533827,
+    "ast_hash": "1875c0b2761e94c146cffe7ef51c3648",
+    "semantic_hash": ""
   },
   "src/model/slideSchema.ts": {
-    "mtime": 1794917009.3713567,
-    "ast_hash": "0310619d7a66cf4af28a66d5c516419a",
+    "mtime": 1794954780.8214264,
+    "ast_hash": "37c20e601fef83172fc77bd7656b9e53",
     "semantic_hash": ""
   },
   "src/model/slideTemplate.test.ts": {
@@ -110,23 +110,23 @@
     "semantic_hash": ""
   },
   "src/importers/htmlImporter.ts": {
-    "mtime": 1794952558.3018928,
-    "ast_hash": "69da095a9b00cb4d56e899e057e27da6",
+    "mtime": 1794954854.7492883,
+    "ast_hash": "e228f9d5713ab83e89552fc924c5d603",
     "semantic_hash": ""
   },
   "src/importers/htmlSanitizer.test.ts": {
-    "mtime": 1794952589.9871788,
-    "ast_hash": "024eecf61e3e3cfa33c1bdb174307f15",
+    "mtime": 1794953629.8032417,
+    "ast_hash": "def8862491163849958cf4966f439085",
     "semantic_hash": ""
   },
   "src/importers/htmlSanitizer.ts": {
-    "mtime": 1794952589.9870183,
-    "ast_hash": "b2f1bde3ba288e0b52352aad8b4f2093",
+    "mtime": 1794954747.582065,
+    "ast_hash": "24f1fb83010f5242cb97955e5c427e08",
     "semantic_hash": ""
   },
   "tests/html-import.spec.ts": {
-    "mtime": 1794952558.3020346,
-    "ast_hash": "7b77ca512d0dfa30dbc617df2220a04c",
+    "mtime": 1794954854.7578373,
+    "ast_hash": "426b10f1de06fd655af47153f9be4c59",
     "semantic_hash": ""
   },
   "vitest.config.ts": {
@@ -162,6 +162,16 @@
   "samples/sample-slides.html": {
     "mtime": 1794950516.0238643,
     "ast_hash": "addfa765490bfa1c5437e6d471cb24d3",
+    "semantic_hash": ""
+  },
+  "src/components/textStyle.ts": {
+    "mtime": 1794954780.8244686,
+    "ast_hash": "dd4adcc9535e3e7c877a3c8da53304ca",
+    "semantic_hash": ""
+  },
+  "src/model/legacySlideSchema.ts": {
+    "mtime": 1794953547.8642697,
+    "ast_hash": "0310619d7a66cf4af28a66d5c516419a",
     "semantic_hash": ""
   }
 }

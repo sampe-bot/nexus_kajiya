@@ -55,8 +55,8 @@
     "semantic_hash": ""
   },
   "src/model/slideSchema.ts": {
-    "mtime": 1794954780.8214264,
-    "ast_hash": "37c20e601fef83172fc77bd7656b9e53",
+    "mtime": 1794954962.5721853,
+    "ast_hash": "fc557c9fa99d2b5d9a9e538e85abfb27",
     "semantic_hash": ""
   },
   "src/model/slideTemplate.test.ts": {
@@ -90,8 +90,8 @@
     "semantic_hash": "55c53a94c9510ee9f18be8c5eaff258f"
   },
   "README.md": {
-    "mtime": 1794950516.0462577,
-    "ast_hash": "32fcc0f46b5b4b8e1a3b51880cd554c4",
+    "mtime": 1794954962.528577,
+    "ast_hash": "ec2b1d3f9922bd24fab270143715728e",
     "semantic_hash": ""
   },
   "compose.yaml": {
@@ -135,13 +135,13 @@
     "semantic_hash": ""
   },
   "docs/architecture.md": {
-    "mtime": 1794950516.0466738,
-    "ast_hash": "afc7cd8a3fa3c1aee3073711da570679",
+    "mtime": 1794954962.6244783,
+    "ast_hash": "d50f2f7c5d44b4905d8d1e591b2e836f",
     "semantic_hash": ""
   },
   "docs/html-import-plan.md": {
-    "mtime": 1794952983.806434,
-    "ast_hash": "f9a94b282a5576b22df6beecf62ba237",
+    "mtime": 1794954962.6242137,
+    "ast_hash": "7bbe6b896c902ec8a0477aa17d4098c2",
     "semantic_hash": ""
   },
   "docs/progress.md": {
@@ -170,8 +170,8 @@
     "semantic_hash": ""
   },
   "src/model/legacySlideSchema.ts": {
-    "mtime": 1794953547.8642697,
-    "ast_hash": "0310619d7a66cf4af28a66d5c516419a",
+    "mtime": 1794954962.5511835,
+    "ast_hash": "beb861c807a7debf673411159bc7e927",
     "semantic_hash": ""
   }
 }

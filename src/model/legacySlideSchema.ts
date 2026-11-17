@@ -1,3 +1,4 @@
+// Frozen v1/v2 schemas: preserve original validation before migration to v3.
 import { z } from "zod";
 
 // アプリのドキュメントの識別子と最新バージョン情報

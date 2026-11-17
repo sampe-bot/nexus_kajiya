@@ -127,7 +127,7 @@ export const slideSchema = z
   // カスタム検証ルール（要素IDの重複チェック＆画面はみ出しチェック）を適用
   .superRefine(validateSlideElements);
 
-// ドキュメント全体（最新 v2）のスキーマ定義
+// ドキュメント全体（最新 v3）のスキーマ定義
 export const slideDocumentSchema = z
   .object({
     kind: z.literal(SLIDE_DOCUMENT_KIND),
