@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   safeParseSlideDocument,
+  slideDocumentV1Schema,
   slideDocumentSchema,
   type SlideDocument,
   type SlideDocumentV1,
@@ -9,7 +10,7 @@ import {
 function createValidDocument(): SlideDocument {
   return {
     kind: "nexus-kajiya.slide-document",
-    version: 2,
+    version: 3,
     slides: [
       {
         id: "slide-1",
@@ -60,7 +61,7 @@ function createValidDocument(): SlideDocument {
 function createLegacyDocument(): SlideDocumentV1 {
   const currentDocument = createValidDocument();
 
-  return {
+  return slideDocumentV1Schema.parse({
     ...currentDocument,
     version: 1,
     slides: [
@@ -72,7 +73,7 @@ function createLegacyDocument(): SlideDocumentV1 {
         })),
       },
     ],
-  };
+  });
 }
 
 describe("slideDocumentSchema", () => {
@@ -195,14 +196,14 @@ describe("slideDocumentSchema", () => {
 });
 
 describe("safeParseSlideDocument", () => {
-  it("v1をIDと内容を保ったままv2へ移行する", () => {
+  it("v1をIDと内容を保ったままv3へ移行する", () => {
     const legacyDocument = createLegacyDocument();
 
     const result = safeParseSlideDocument(legacyDocument);
 
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.version).toBe(2);
+      expect(result.data.version).toBe(3);
       expect(result.data.slides[0].id).toBe(legacyDocument.slides[0].id);
       expect(result.data.slides[0].elements.map((element) => element.id)).toEqual(
         legacyDocument.slides[0].elements.map((element) => element.id),
@@ -231,4 +232,29 @@ describe("safeParseSlideDocument", () => {
       );
     }
   });
+});
+
+it('v2を以前の閉じたスキーマで検証してからv3へ移行する', () => {
+  const old = { ...createValidDocument(), version: 2 };
+  const parsed = safeParseSlideDocument(old);
+  expect(parsed.success).toBe(true);
+  if (parsed.success) {
+    expect(parsed.data.version).toBe(3);
+    expect(parsed.data.slides).toEqual(old.slides);
+  }
+  const unsupported = structuredClone(old);
+  unsupported.slides[0].elements[0].style.fontWeight = '850';
+  expect(safeParseSlideDocument(unsupported).success).toBe(false);
+});
+
+it('v3の書式付きテキストを保存・復元し、本文との不整合を拒否する', () => {
+  const document = createValidDocument();
+  const element = document.slides[0].elements[0];
+  element.style.fontWeight = '850';
+  element.style.fontFamily = 'system-ui, sans-serif';
+  element.style.letterSpacing = -1.5;
+  element.runs = [{ text: element.text, style: { ...element.style, color: '#00ff00' } }];
+  expect(safeParseSlideDocument(JSON.parse(JSON.stringify(document)))).toEqual({ success: true, data: document });
+  element.runs[0].text = '違う内容';
+  expect(safeParseSlideDocument(document).success).toBe(false);
 });

@@ -95,7 +95,7 @@ flowchart LR
 ### 4.1 起動と通常編集
 
 1. `App`が初期Document ModelをReact stateとして保持する
-2. `SlideRenderer`が先頭のSlideを表示する
+2. `SlideRenderer`が選択中のSlideを表示する
 3. `SlideEditor`がRendererの上に編集用オーバーレイを配置する
 4. ドラッグまたはテキスト確定時に、EditorがDocument Operationを呼ぶ
 5. Operationが新しいDocument Modelを返し、`App`のstateを更新する
@@ -279,6 +279,8 @@ AIにはモデル全体の自由な再生成ではなく、検証可能なComman
 - スライド編集と同時に汎用的な社内WikiやRAG基盤を完成させる
 
 対応HTMLを取り込む場合も、編集可能な要素とCSSを定義したサポート対象形式から段階的に進めます。
+
+HTML読み込みの追加実装は[HTML読み込みの実装方針](html-import-plan.md)に従います。初版は静的HTMLの対応部分をDocument Model v2へ変換し、変換後のプレビューと警告を確認してから編集文書へ取り込みます。初版は実装済みで、複数スライドの選択と編集にも対応します。
 
 ## 10. 設計判断の基準
 

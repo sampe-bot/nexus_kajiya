@@ -1,3 +1,4 @@
+import { textCss } from "./textStyle";
 import type { CSSProperties } from "react";
 import type { Slide } from "../model/slideSchema";
 
@@ -16,10 +17,6 @@ export function SlideRenderer({
       style={{ backgroundColor: slide.background }}
       aria-label="スライドプレビュー"
     >
-      <div className="slide-accent" aria-hidden="true" />
-      <p className="slide-kicker" aria-hidden="true">
-        NEXUS KAJIYA / 01
-      </p>
       {/*将来的に画像や図形が追加されることを想定した分岐*/}
       {slide.elements.map((element) => {
         if (element.type !== "text") {
@@ -31,11 +28,9 @@ export function SlideRenderer({
           top: `${(element.y / slide.height) * 100}%`,
           width: `${(element.width / slide.width) * 100}%`,
           height: `${(element.height / slide.height) * 100}%`,
-          color: element.style.color,
-          fontSize: `${(element.style.fontSize / slide.width) * 100}cqw`,
-          fontWeight: element.style.fontWeight,
-          lineHeight: element.style.lineHeight,
-          textAlign: element.style.textAlign,
+          ...textCss(element.style, slide.width),
+          display: element.verticalAlign === 'top' ? 'block' : 'flex',
+
         };
 
         return (
@@ -50,14 +45,13 @@ export function SlideRenderer({
             data-slide-element-id={element.id}
             style={style}
           >
-            {element.text}
+            {element.runs ? element.runs.map((run, index) => run.lineBreak
+              ? <br key={index} />
+              : <span key={index} style={textCss(run.style, slide.width)}>{run.text}</span>) : element.text}
           </div>
         );
       })}
 
-      <p className="slide-footer" aria-hidden="true">
-        Structured slide document
-      </p>
     </article>
   );
 }

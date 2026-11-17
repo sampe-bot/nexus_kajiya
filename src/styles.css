@@ -123,3 +123,12 @@ button.primary { border-color: #2563eb; color: #fff; background: #2563eb; }
   .app-header { align-items: stretch; flex-direction: column; }
   .toolbar button { flex: 1; }
 }
+
+.toolbar { flex-wrap: wrap; }
+button:disabled { opacity: .5; cursor: wait; }
+.slide-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 0 0 14px; }
+.slide-tabs button { flex-shrink: 0; }
+.slide-tabs button[aria-pressed="true"] { color: #fff; background: #2563eb; }
+.import-preview { padding: 24px; margin-bottom: 24px; border: 2px solid #2563eb; border-radius: 16px; background: #fff; }
+.preview-canvas { position: relative; aspect-ratio: 16 / 9; container-type: inline-size; overflow: hidden; }
+.import-warnings { max-height: 180px; overflow: auto; line-height: 1.7; }

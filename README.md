@@ -24,9 +24,11 @@ LLMが作った最初の90%をすべて再生成するのではなく、人とAI
 - 複数スライド・任意数要素を表現できるDocument Model v2
 - ZodによるJSON検証と、v1からv2への自動マイグレーション
 - JSONファイルの読み込みと保存
+- 静的HTMLの対応部分を編集可能なテキストへ変換し、プレビュー後に取り込み
+- 複数スライドの切り替えと編集
 - 表示専用Rendererと編集オーバーレイの分離
 
-画面上で編集できるのは現在、文書内の先頭スライドだけです。サンプルデータは[`samples/sample-slide-document.json`](samples/sample-slide-document.json)にあります。
+画面上部のページボタンで、文書内の各スライドを切り替えて編集できます。サンプルデータは[`samples/sample-slide-document.json`](samples/sample-slide-document.json)にあります。
 
 ### 現在の操作
 
@@ -36,6 +38,11 @@ LLMが作った最初の90%をすべて再生成するのではなく、人とAI
 - `Esc`: 編集をキャンセル
 - `JSONを保存`: 現在のDocument Modelをダウンロード
 - `JSONを読み込む`: 保存済みの状態を復元
+- `HTMLを読み込む`: 変換後の全ページと警告を確認し、「この内容で取り込む」で現在の文書を置き換え
+
+HTMLはUTF-8の単一ファイルが対象です。`data-nexus-slide`または`.slide`をスライド単位として扱い、指定がなければ本文全体を1枚として扱います。スライドは16:9にしてください。画像・表・SVG・複雑な装飾・JavaScriptによる動的表示は対象外で、外部ファイルも取得しません。フォントはアプリ共通フォントへ統一され、完全な見た目の再現には対応していません。
+
+[HTMLサンプル](samples/sample-slides.html)と[詳しい対応範囲](docs/html-import-plan.md)を参照してください。取り込みを確定する前に、編集中の文書を必要に応じてJSONで保存してください。
 
 ## セットアップ
 
@@ -45,7 +52,7 @@ LLMが作った最初の90%をすべて再生成するのではなく、人とAI
 docker compose up --build
 ```
 
-ブラウザで`http://localhost:5173`を開きます。
+ブラウザで`http://localhost:5173`を開きます。依存パッケージを追加した後に既存コンテナを使う場合は、`docker compose exec app npm ci`と`docker compose restart app`で反映します。
 
 ### ローカル開発
 
@@ -61,6 +68,8 @@ npm run dev
 ```bash
 npm test
 npm run build
+# インストール済みのGoogle Chromeでブラウザテスト
+npm run test:e2e
 ```
 
 ### 本番用コンテナ

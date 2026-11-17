@@ -9,3 +9,8 @@ coverage/
 .env
 .env.*
 !.env.example
+
+test-results/
+playwright-report/
+
+samples/exawizards_ai_driven_management_internal.html

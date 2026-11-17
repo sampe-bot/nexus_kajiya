@@ -1,1 +1,24 @@
-{"0": "Document Schema Core", "1": "Product Architecture and Rationale", "2": "TypeScript App Configuration", "3": "Runtime Package Configuration", "4": "Slide Editing Interaction", "5": "Frontend Development Dependencies", "6": "Development Runtime and Bootstrap", "7": "Rendering and Template Validation", "8": "Vite Build Configuration", "9": "Product Roadmap", "10": "TypeScript Project References", "11": "Python Hello World Stub", "12": "Python Package Metadata", "13": "Vite Config File"}
+{
+  "0": "slideSchema.ts",
+  "1": "v0.1 Core Prototype MVP",
+  "2": "compilerOptions",
+  "3": "package.json",
+  "4": "SlideEditor.tsx",
+  "5": "devDependencies",
+  "6": "app Service",
+  "7": "Nexus Kajiya アーキテクチャ",
+  "8": "compilerOptions",
+  "9": "`SlideRenderer.tsx`",
+  "10": "tsconfig.json",
+  "11": "main.py",
+  "12": "nexus-kajiya",
+  "13": "vite.config.ts",
+  "14": "App.tsx",
+  "15": "HTML読み込みの実装方針",
+  "16": "P0 開発基準線の復元",
+  "17": "html-import.spec.ts",
+  "18": "notes.md",
+  "19": "playwright.config.ts",
+  "20": "vitest.config.ts",
+  "21": "legacySlideSchema.ts"
+}

@@ -1,8 +1,10 @@
 import { z } from "zod";
+import { safeParseSlideDocument as parseLegacy, type SlideDocumentV1 } from './legacySlideSchema';
+export { slideDocumentV1Schema, type SlideDocumentV1 } from './legacySlideSchema';
 
 // アプリのドキュメントの識別子と最新バージョン情報
 export const SLIDE_DOCUMENT_KIND = "nexus-kajiya.slide-document" as const;
-export const CURRENT_SLIDE_DOCUMENT_VERSION = 2 as const;
+export const CURRENT_SLIDE_DOCUMENT_VERSION = 3 as const;
 
 // スライドの論理サイズ（画面アスペクト比 16:9 の基準値）
 export const SLIDE_WIDTH = 960;
@@ -31,13 +33,30 @@ const elementFrameSchema = z
 // テキスト要素の装飾スタイル定義
 export const textStyleSchema = z
   .object({
-    fontSize: z.number().finite().min(8).max(160),
-    fontWeight: z.enum(["400", "500", "600", "700"]),
-    lineHeight: z.number().finite().min(1).max(2),
+    fontSize: z.number().finite().min(1).max(500),
+    fontWeight: z.string().regex(/^\d{1,4}(?:\.\d+)?$/).refine(value => Number(value) >= 1 && Number(value) <= 1000),
+    lineHeight: z.union([z.number().finite().min(0.5).max(10), z.literal("normal")]),
     color: hexColorSchema,
-    textAlign: z.enum(["left", "center", "right"]),
+    textAlign: z.enum(["left", "center", "right", "start", "end", "justify"]),
+    fontFamily: z.string().min(1).max(512).optional(),
+    letterSpacing: z.number().finite().min(-100).max(100).optional(),
+    inlineMarginLeft: z.number().finite().min(-960).max(960).optional(),
+    inlineMarginRight: z.number().finite().min(-960).max(960).optional(),
+    fontStyle: z.enum(['normal', 'italic', 'oblique']).optional(),
+    whiteSpace: z.enum(['normal', 'nowrap', 'pre', 'pre-wrap', 'pre-line', 'break-spaces']).optional(),
+    textTransform: z.enum(['none', 'uppercase', 'lowercase', 'capitalize']).optional(),
+    wordBreak: z.enum(['normal', 'break-all', 'keep-all', 'break-word']).optional(),
+    overflowWrap: z.enum(['normal', 'break-word', 'anywhere']).optional(),
   })
   .strict();
+
+export const textRunSchema = z.object({
+  text: z.string(),
+  style: textStyleSchema,
+  lineBreak: z.boolean().optional(),
+}).strict();
+export type TextStyle = z.infer<typeof textStyleSchema>;
+export type TextRun = z.infer<typeof textRunSchema>;
 
 // テキスト要素本体の定義（elementFrameSchema を継承・拡張）
 export const textElementSchema = elementFrameSchema
@@ -45,6 +64,8 @@ export const textElementSchema = elementFrameSchema
     type: z.literal("text"),
     text: z.string(),
     style: textStyleSchema,
+    runs: z.array(textRunSchema).max(10000).optional(),
+    verticalAlign: z.enum(['top', 'center']).optional(),
   })
   .strict();
 
@@ -65,6 +86,10 @@ function validateSlideElements(
   const ids = new Set<string>();
 
   slide.elements.forEach((element, index) => {
+    const text = element as z.infer<typeof textElementSchema>;
+    if (text.runs && (text.runs.map(run => run.text).join('') !== text.text || text.runs.some(run => run.lineBreak && run.text !== '\n'))) {
+      context.addIssue({ code: 'custom', path: ['elements', index, 'runs'], message: '文字と書式付きテキストが一致しません' });
+    }
     // チェック1: 同一スライド内で要素IDが重複していないか
     if (ids.has(element.id)) {
       context.addIssue({
@@ -144,87 +169,18 @@ export type SlideElement = z.infer<typeof slideElementSchema>;
 export type Slide = z.infer<typeof slideSchema>;
 export type SlideDocument = z.infer<typeof slideDocumentSchema>;
 
-// v1 remains explicit so imported files are validated against the format they
-// declare before being migrated. Template-specific title/body requirements are
-// preserved only here; they are not document-level invariants in v2.
-const legacyTextElementSchema = textElementSchema
-  .extend({ role: z.enum(["title", "body"]) })
-  .strict();
-
-const legacySlideSchema = z
-  .object({
-    id: idSchema,
-    width: z.literal(SLIDE_WIDTH),
-    height: z.literal(SLIDE_HEIGHT),
-    background: hexColorSchema,
-    elements: z.array(legacyTextElementSchema).min(2),
-  })
-  .strict()
-  .superRefine((slide, context) => {
-    validateSlideElements(slide, context);
-
-    // v1 スライドには title と body の両方が必須という昔のルールをチェック
-    const roles = new Set(slide.elements.map((element) => element.role));
-    (["title", "body"] as const).forEach((role) => {
-      if (!roles.has(role)) {
-        context.addIssue({
-          code: "custom",
-          path: ["elements"],
-          message: `${role}要素が必要です`,
-        });
-      }
-    });
-  });
-
-export const slideDocumentV1Schema = z
-  .object({
-    kind: z.literal(SLIDE_DOCUMENT_KIND),
-    version: z.literal(1),
-    slides: z.array(legacySlideSchema).length(1),
-  })
-  .strict();
-
-export type SlideDocumentV1 = z.infer<typeof slideDocumentV1Schema>;
-
-export function migrateSlideDocumentV1(
-  legacyDocument: SlideDocumentV1,
-): SlideDocument {
-  return {
-    kind: legacyDocument.kind,
-    version: CURRENT_SLIDE_DOCUMENT_VERSION,
-    slides: legacyDocument.slides.map((slide) => ({
-      ...slide,
-      elements: slide.elements.map((element) => ({
-        ...element,
-        style: { ...element.style },
-      })),
-    })),
-  };
+// Validate older versions against their original closed schemas before upgrading.
+export function migrateSlideDocumentV1(document: SlideDocumentV1): SlideDocument {
+  const result = safeParseSlideDocument(document);
+  if (!result.success) throw result.error;
+  return result.data;
 }
-
-function declaresVersion(input: unknown, version: number): boolean {
-  return (
-    typeof input === "object" &&
-    input !== null &&
-    "version" in input &&
-    input.version === version
-  );
-}
-
-export function safeParseSlideDocument(
-  input: unknown,
-): z.SafeParseReturnType<unknown, SlideDocument> {
-  if (declaresVersion(input, 1)) {
-    const legacyResult = slideDocumentV1Schema.safeParse(input);
-    if (!legacyResult.success) {
-      return legacyResult;
-    }
-
-    return slideDocumentSchema.safeParse(
-      migrateSlideDocumentV1(legacyResult.data),
-    );
+export function safeParseSlideDocument(input: unknown): z.SafeParseReturnType<unknown, SlideDocument> {
+  if (typeof input === 'object' && input !== null && 'version' in input && (input.version === 1 || input.version === 2)) {
+    const legacy = parseLegacy(input);
+    if (!legacy.success) return legacy;
+    return slideDocumentSchema.safeParse({ ...legacy.data, version: CURRENT_SLIDE_DOCUMENT_VERSION });
   }
-
   return slideDocumentSchema.safeParse(input);
 }
 

@@ -8,7 +8,7 @@ import type { SlideDocument } from "./slideSchema";
 function createDocument(): SlideDocument {
   return {
     kind: "nexus-kajiya.slide-document",
-    version: 2,
+    version: 3,
     slides: [
       {
         id: "slide-1",
@@ -103,4 +103,23 @@ describe("documentOperations", () => {
 
     expect(updated).toBe(original);
   });
+});
+
+it('書式付きテキストの一部を書き換えても周囲の色・太さ・改行を保持する', () => {
+  const document = createDocument();
+  const element = document.slides[0].elements[0];
+  element.text = '前半色付き\n後半';
+  element.runs = [
+    { text: '前半', style: element.style },
+    { text: '色付き', style: { ...element.style, color: '#00ff00', fontWeight: '850' } },
+    { text: '\n', lineBreak: true, style: element.style },
+    { text: '後半', style: element.style },
+  ];
+  const snapshot = structuredClone(document);
+  const result = updateTextElement(document, 'slide-1', 'title-1', '前半に追記色付き\n後半');
+  const runs = result.slides[0].elements[0].runs!;
+  expect(runs.map(run => run.text).join('')).toBe('前半に追記色付き\n後半');
+  expect(runs.find(run => run.text === '色付き')?.style).toMatchObject({ color: '#00ff00', fontWeight: '850' });
+  expect(runs.find(run => run.lineBreak)?.text).toBe('\n');
+  expect(document).toEqual(snapshot);
 });

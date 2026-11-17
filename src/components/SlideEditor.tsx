@@ -13,6 +13,7 @@ import type {
   SlideDocument,
   TextElement,
 } from "../model/slideSchema";
+import { textCss } from "./textStyle";
 import { SlideRenderer } from "./SlideRenderer";
 
 // SlideEditor は内部で document を保持せず、編集結果を必ず親へ返す。
@@ -20,6 +21,7 @@ import { SlideRenderer } from "./SlideRenderer";
 type SlideEditorProps = {
   document: SlideDocument;
   onChange: (document: SlideDocument) => void;
+  activeSlideId?: string;
 };
 
 // ドラッグ中の座標計算用データ
@@ -39,9 +41,9 @@ type EditingState = {
   initialValue: string;
 };
 
-export function SlideEditor({ document, onChange }: SlideEditorProps) {
+export function SlideEditor({ document, onChange, activeSlideId }: SlideEditorProps) {
   
-  const slide = document.slides[0];
+  const slide = document.slides.find(slide => slide.id === activeSlideId) ?? document.slides[0];
 
   // 画面上の実際のキャンバスサイズ（width/height）を測るための参照
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -244,12 +246,7 @@ function InlineTextEditor({
       aria-label={`${element.role ?? "text"}テキストを編集`}
       value={value}
       style={{
-        color: element.style.color,
-        // コンテナの幅（cqw: Container Query Width）に合わせて文字サイズも自動スケールさせる
-        fontSize: `${(element.style.fontSize / 960) * 100}cqw`,
-        fontWeight: element.style.fontWeight,
-        lineHeight: element.style.lineHeight,
-        textAlign: element.style.textAlign,
+        ...textCss(element.style),
       }}
       onChange={(event) => setValue(event.target.value)}
       // 入力中のクリック・ドラッグが親（キャンバス）のドラッグ処理とバッティングしないようイベントを遮断
